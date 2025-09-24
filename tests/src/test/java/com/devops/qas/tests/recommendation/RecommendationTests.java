@@ -7,77 +7,111 @@ import java.util.List;
 class RecommendationTests {
 
     // --- Integrante 1 ---
+    // Pedro Andrade
     @Test
     void deveExibirRecomendacoesNaPaginaInicialQuandoAlunoConcluiuCurso() {
-        // Arrange
         RecommendationServiceStub service = new RecommendationServiceStub();
         Long alunoId = 1L;
-
-        // Act
         List<String> recomendacoes = service.getRecommendations(alunoId);
-
-        // Assert
-        assertNotNull(recomendacoes, "As recomendações não deveriam ser nulas");
-        assertFalse(recomendacoes.isEmpty(), "A lista deveria conter cursos recomendados");
+        assertNotNull(recomendacoes);
+        assertFalse(recomendacoes.isEmpty());
     }
 
     // --- Integrante 2 ---
+    // Kevyn Rocha
     @Test
     void deveEnviarEmailComRecomendacoesQuandoAlunoPossuiEmailValido() {
-        // Arrange
         RecommendationServiceStub service = new RecommendationServiceStub();
         Long alunoId = 2L;
-
-        // Act
         boolean enviado = service.sendRecommendationEmail(alunoId, "aluno@teste.com");
-
-        // Assert
-        assertTrue(enviado, "O e-mail com recomendações deveria ter sido enviado");
+        assertTrue(enviado);
     }
 
     // --- Integrante 3 ---
+    // José Antônio
     @Test
     void deveFiltrarRecomendacoesPorCategoriaQuandoAlunoSelecionaCategoria() {
-        // Arrange
         RecommendationServiceStub service = new RecommendationServiceStub();
         Long alunoId = 3L;
-
-        // Act
         List<String> recomendacoes = service.filterRecommendationsByCategory(alunoId, "Tecnologia");
-
-        // Assert
-        assertNotNull(recomendacoes, "A lista filtrada não deveria ser nula");
-        assertTrue(recomendacoes.stream().allMatch(curso -> curso.contains("Tecnologia")),
-                "Todas as recomendações deveriam ser da categoria escolhida");
+        assertNotNull(recomendacoes);
+        assertFalse(recomendacoes.isEmpty());
+        assertTrue(recomendacoes.stream().allMatch(curso -> curso.contains("Tecnologia")));
     }
 
     // --- Integrante 4 ---
+    // Henry Santurião
     @Test
     void deveSalvarCursoNaListaPessoalQuandoAlunoClicaEmSalvarParaDepois() {
-        // Arrange
         RecommendationServiceStub service = new RecommendationServiceStub();
         Long alunoId = 4L;
         String curso = "Curso de DevOps";
-
-        // Act
         boolean salvo = service.saveRecommendationForLater(alunoId, curso);
-
-        // Assert
-        assertTrue(salvo, "O curso deveria estar salvo na lista pessoal do aluno");
+        assertTrue(salvo);
     }
 
     // --- Integrante 5 ---
+    // Luis Augusto
     @Test
     void deveRegistrarAvaliacaoQuandoAlunoMarcaRecomendacaoComoUtil() {
-        // Arrange
         RecommendationServiceStub service = new RecommendationServiceStub();
         Long alunoId = 5L;
         String curso = "Curso de Testes";
-
-        // Act
         boolean registrado = service.markRecommendationAsUseful(alunoId, curso);
+        assertTrue(registrado);
+    }
 
-        // Assert
-        assertTrue(registrado, "A avaliação deveria ter sido registrada");
+    // ============================
+    // NOVOS TESTES PARA COBRIR RAMOS
+    // ============================
+
+    // --- Integrante 2 (Kevyn Rocha) ---
+    @Test
+    void naoDeveEnviarEmailQuandoEmailForNull() {
+        RecommendationServiceStub service = new RecommendationServiceStub();
+        assertFalse(service.sendRecommendationEmail(2L, null));
+    }
+
+    @Test
+    void naoDeveEnviarEmailQuandoEmailForInvalido() {
+        RecommendationServiceStub service = new RecommendationServiceStub();
+        assertFalse(service.sendRecommendationEmail(2L, "aluno@"));
+    }
+
+    @Test
+    void naoDeveEnviarEmailQuandoNaoHouverRecomendacoes() {
+        RecommendationServiceStub service = new RecommendationServiceStub();
+        assertFalse(service.sendRecommendationEmail(999L, "ok@teste.com"));
+    }
+
+    // --- Integrante 3 (José Antônio) ---
+    @Test
+    void deveRetornarListaCompletaQuandoCategoriaForNull() {
+        RecommendationServiceStub service = new RecommendationServiceStub();
+        List<String> lista = service.filterRecommendationsByCategory(3L, null);
+        assertFalse(lista.isEmpty());
+    }
+
+    @Test
+    void deveRetornarListaVaziaQuandoCategoriaNaoExistir() {
+        RecommendationServiceStub service = new RecommendationServiceStub();
+        List<String> lista = service.filterRecommendationsByCategory(3L, "Medicina");
+        assertTrue(lista.isEmpty());
+    }
+
+    // --- Integrante 4 (Henry Santurião) ---
+    @Test
+    void naoDeveSalvarCursoQuandoForNullOuBlank() {
+        RecommendationServiceStub service = new RecommendationServiceStub();
+        assertFalse(service.saveRecommendationForLater(4L, null));
+        assertFalse(service.saveRecommendationForLater(4L, "   "));
+    }
+
+    // --- Integrante 5 (Luis Augusto) ---
+    @Test
+    void naoDeveRegistrarAvaliacaoQuandoCursoForNullOuBlank() {
+        RecommendationServiceStub service = new RecommendationServiceStub();
+        assertFalse(service.markRecommendationAsUseful(5L, null));
+        assertFalse(service.markRecommendationAsUseful(5L, ""));
     }
 }
